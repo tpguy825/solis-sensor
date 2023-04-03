@@ -337,6 +337,7 @@ class SoliscloudAPI(BaseAPI):
                     value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
+        self._data[STRING1_POWER] = self._data[STRING1_POWER] + self._data[STRING2_POWER] + self._data[STRING3_POWER] + self._data[STRING4_POWER]
 
     async def _get_station_details(self, plant_id: str) -> dict[str, str] | None:
         """

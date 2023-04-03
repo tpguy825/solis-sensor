@@ -1,7 +1,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
 # Solis sensor integration
-HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com) and SolisCloud portal. 
+Edited HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com) and SolisCloud portal. 
 Still questions after the readme? Read the [wiki](https://github.com/hultenvp/solis-sensor/wiki) or look at the [discussions page](https://github.com/hultenvp/solis-sensor/discussions)
 
 ## Platform v2

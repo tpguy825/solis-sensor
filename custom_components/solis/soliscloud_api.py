@@ -7,7 +7,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from __future__ import annotations
 
 import hashlib
-#from hashlib import sha1
+# from hashlib import sha1
 import hmac
 import base64
 import asyncio
@@ -40,8 +40,8 @@ CONTENT = 'Content'
 STATUS_CODE = 'StatusCode'
 MESSAGE = 'Message'
 
-#VALUE_RECORD = '_from_record'
-#VALUE_ELEMENT = ''
+# VALUE_RECORD = '_from_record'
+# VALUE_ELEMENT = ''
 
 VERB = "POST"
 
@@ -66,7 +66,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ACPOWER:                 ['pac', float, 3],
         INVERTER_ACPOWER_STR:             ['pacStr', str, None],
         INVERTER_ACFREQUENCY:             ['fac', float, 2],
-        INVERTER_ENERGY_TODAY:            ['eToday', float, 2], # Default
+        INVERTER_ENERGY_TODAY:            ['eToday', float, 2],  # Default
         INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
         INVERTER_ENERGY_THIS_MONTH_STR:   ['eMonthStr', str, None],
         INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
@@ -82,10 +82,10 @@ INVERTER_DATA: InverterDataType = {
         STRING2_CURRENT:                  ['iPv2', float, 2],
         STRING3_CURRENT:                  ['iPv3', float, 2],
         STRING4_CURRENT:                  ['iPv4', float, 2],
-        STRING1_POWER:                    ['pow1', float, 2], # Undocumented
-        STRING2_POWER:                    ['pow2', float, 2], # Undocumented
-        STRING3_POWER:                    ['pow3', float, 2], # Undocumented
-        STRING4_POWER:                    ['pow4', float, 2], # Undocumented
+        STRING1_POWER:                    ['pow1', float, 2],  # Undocumented
+        STRING2_POWER:                    ['pow2', float, 2],  # Undocumented
+        STRING3_POWER:                    ['pow3', float, 2],  # Undocumented
+        STRING4_POWER:                    ['pow4', float, 2],  # Undocumented
         PHASE1_VOLTAGE:                   ['uAc1', float, 2],
         PHASE2_VOLTAGE:                   ['uAc2', float, 2],
         PHASE3_VOLTAGE:                   ['uAc3', float, 2],
@@ -126,29 +126,32 @@ INVERTER_DATA: InverterDataType = {
         SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0]
     },
     PLANT_DETAIL: {
-        INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
+        # stationName no longer available?
+        INVERTER_PLANT_NAME:              ['sno', str, None],
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]  # If override set
     },
     PLANT_LIST: {
-        INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
+        # stationName no longer available?
+        INVERTER_PLANT_NAME:              ['sno', str, None],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]  # If override set
     },
 }
+
 
 class SoliscloudConfig(PortalConfig):
     """ Portal configuration data """
 
     def __init__(self,
-        portal_domain: str,
-        portal_username: str,
-        portal_key_id: str,
-        portal_secret: bytes,
-        portal_plantid: str
-    ) -> None:
+                 portal_domain: str,
+                 portal_username: str,
+                 portal_key_id: str,
+                 portal_secret: bytes,
+                 portal_plantid: str
+                 ) -> None:
         super().__init__(portal_domain, portal_username, portal_plantid)
         self._key_id: str = portal_key_id
         self._secret: bytes = portal_secret
@@ -174,6 +177,7 @@ class SoliscloudConfig(PortalConfig):
     def workarounds(self) -> dict[str, Any]:
         """ Return all workaround settings """
         return self._workarounds
+
 
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
@@ -207,12 +211,13 @@ class SoliscloudAPI(BaseAPI):
 
         # Request inverter list
         self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
-        if len(self._inverter_list)==0:
+        if len(self._inverter_list) == 0:
             _LOGGER.warning("No inverters found")
             self._is_online = False
         else:
             _LOGGER.info("Login successful")
-            _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
+            _LOGGER.debug("Found inverters: %s", list(
+                self._inverter_list.keys()))
             self._is_online = True
             try:
                 data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
@@ -243,8 +248,8 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
             if result_json['code'] != '0':
-                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL, \
-                    result_json['code'], result_json['msg'])
+                _LOGGER.info("%s responded with error: %s:%s", INVERTER_DETAIL,
+                             result_json['code'], result_json['msg'])
                 return device_ids
             try:
                 for record in result_json['data']['page']['records']:
@@ -252,7 +257,8 @@ class SoliscloudAPI(BaseAPI):
                     device_id = record.get('id')
                     device_ids[serial] = device_id
             except TypeError:
-                _LOGGER.debug("Response contains unexpected data: %s", result_json)
+                _LOGGER.debug(
+                    "Response contains unexpected data: %s", result_json)
         elif result[STATUS_CODE] == 408:
             now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
             _LOGGER.warning("Your system time must be set correctly for this integration \
@@ -276,7 +282,7 @@ class SoliscloudAPI(BaseAPI):
                 await asyncio.sleep(1)
                 payload2 = await self._get_station_from_list(self.config.plant_id)
                 if payload is not None:
-                    #_LOGGER.debug("%s", payload)
+                    # _LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
                 if payload2 is not None:
@@ -286,11 +292,10 @@ class SoliscloudAPI(BaseAPI):
                 _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
 
-
     async def _get_inverter_details(self,
-        device_id: str,
-        device_serial: str
-    ) -> dict[str, Any] | None:
+                                    device_id: str,
+                                    device_serial: str
+                                    ) -> dict[str, Any] | None:
         """
         Update inverter details
         """
@@ -307,11 +312,12 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
             if jsondata['code'] != '0':
-                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL, \
-                    jsondata['code'], jsondata['msg'])
+                _LOGGER.info("%s responded with error: %s:%s", INVERTER_DETAIL,
+                             jsondata['code'], jsondata['msg'])
                 return None
         else:
-            _LOGGER.info('Unable to fetch details for device with ID: %s', device_id)
+            _LOGGER.info(
+                'Unable to fetch details for device with ID: %s', device_id)
         return jsondata
 
     def _collect_inverter_data(self, payload: dict[str, Any]) -> None:
@@ -337,13 +343,13 @@ class SoliscloudAPI(BaseAPI):
                     value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
-                if dictkey == STRING4_POWER:
-                    self._data[STRING1_POWER] = self._data[STRING1_POWER] + \
-                        self._data[STRING2_POWER] + \
-                        self._data[STRING3_POWER] + self._data[STRING4_POWER]
-                    self._data[STRING2_POWER] = 0
-                    self._data[STRING3_POWER] = 0
-                    self._data[STRING4_POWER] = 0
+                    
+					# The API returns strings 1 and 2 seperately, but we want to add them together
+					# This merges them into only the string 1 value
+                    if dictkey == STRING2_POWER:
+                        self._data[STRING1_POWER] = self._data[STRING1_POWER] + \
+                            self._data[STRING2_POWER]
+                        self._data[STRING2_POWER] = float(0.0)
 
     async def _get_station_details(self, plant_id: str) -> dict[str, str] | None:
         """
@@ -356,14 +362,15 @@ class SoliscloudAPI(BaseAPI):
         result = await self._post_data_json(PLANT_DETAIL, params)
 
         if result[SUCCESS] is True:
-            jsondata : dict[str, str] = result[CONTENT]
+            jsondata: dict[str, str] = result[CONTENT]
             if jsondata['code'] == '0':
                 return jsondata
             else:
-                _LOGGER.info("%s responded with error: %s:%s",PLANT_DETAIL, \
-                    jsondata['code'], jsondata['msg'])
+                _LOGGER.info("%s responded with error: %s:%s", PLANT_DETAIL,
+                             jsondata['code'], jsondata['msg'])
         else:
-            _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
+            _LOGGER.info(
+                'Unable to fetch details for Station with ID: %s', plant_id)
         return None
 
     async def _get_station_from_list(self, plant_id: str) -> dict[str, str] | None:
@@ -375,7 +382,7 @@ class SoliscloudAPI(BaseAPI):
         result = await self._post_data_json(PLANT_LIST, params)
 
         if result[SUCCESS] is True:
-            jsondata : dict[str, str] = result[CONTENT]
+            jsondata: dict[str, str] = result[CONTENT]
             if jsondata['code'] == '0':
                 try:
                     for record in jsondata['data']['page']['records']:
@@ -383,12 +390,14 @@ class SoliscloudAPI(BaseAPI):
                             return record
                     _LOGGER.warning("Not able to find station %s", plant_id)
                 except TypeError:
-                    _LOGGER.debug("Response contains unexpected data: %s", jsondata)
+                    _LOGGER.debug(
+                        "Response contains unexpected data: %s", jsondata)
             else:
-                _LOGGER.info("%s responded with error: %s:%s",PLANT_LIST, \
-                    jsondata['code'], jsondata['msg'])
+                _LOGGER.info("%s responded with error: %s:%s", PLANT_LIST,
+                             jsondata['code'], jsondata['msg'])
         else:
-            _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
+            _LOGGER.info(
+                'Unable to fetch details for Station with ID: %s', plant_id)
         return None
 
     def _collect_station_data(self, payload: dict[str, Any]) -> None:
@@ -415,7 +424,6 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
-
     def _post_process(self) -> None:
         """ Cleanup received data. """
         if self._data:
@@ -431,17 +439,26 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(BAT_POWER, BAT_POWER_STR)
             self._fix_units(BAT_CURRENT, BAT_CURRENT_STR)
             self._fix_units(BAT_VOLTAGE, BAT_VOLTAGE_STR)
-            self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
-            self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
-            self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_CHARGED,
+                            BAT_TOTAL_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED,
+                            BAT_TOTAL_ENERGY_DISCHARGED_STR)
+            self._fix_units(GRID_TOTAL_CONSUMPTION_POWER,
+                            GRID_TOTAL_CONSUMPTION_POWER_STR)
             self._fix_units(GRID_TOTAL_ENERGY_USED, GRID_TOTAL_ENERGY_USED_STR)
             self._fix_units(INVERTER_ACPOWER, INVERTER_ACPOWER_STR)
-            self._fix_units(INVERTER_ENERGY_THIS_MONTH, INVERTER_ENERGY_THIS_MONTH_STR)
-            self._fix_units(INVERTER_ENERGY_THIS_YEAR, INVERTER_ENERGY_THIS_YEAR_STR)
-            self._fix_units(INVERTER_ENERGY_TOTAL_LIFE, INVERTER_ENERGY_TOTAL_LIFE_STR)
-            self._fix_units(GRID_TOTAL_ENERGY_PURCHASED, GRID_TOTAL_ENERGY_PURCHASED_STR)
-            self._fix_units(GRID_DAILY_ON_GRID_ENERGY, GRID_DAILY_ON_GRID_ENERGY_STR)
-            self._fix_units(GRID_TOTAL_ON_GRID_ENERGY, GRID_TOTAL_ON_GRID_ENERGY_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_MONTH,
+                            INVERTER_ENERGY_THIS_MONTH_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_YEAR,
+                            INVERTER_ENERGY_THIS_YEAR_STR)
+            self._fix_units(INVERTER_ENERGY_TOTAL_LIFE,
+                            INVERTER_ENERGY_TOTAL_LIFE_STR)
+            self._fix_units(GRID_TOTAL_ENERGY_PURCHASED,
+                            GRID_TOTAL_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_DAILY_ON_GRID_ENERGY,
+                            GRID_DAILY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_TOTAL_ON_GRID_ENERGY,
+                            GRID_TOTAL_ON_GRID_ENERGY_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
@@ -453,7 +470,8 @@ class SoliscloudAPI(BaseAPI):
 
             # turn batteryPower negative when discharging (fix for https://github.com/hultenvp/solis-sensor/issues/158)
             try:
-                self._data[BAT_POWER] = math.copysign(self._data[BAT_POWER],self._data[BAT_CURRENT])
+                self._data[BAT_POWER] = math.copysign(
+                    self._data[BAT_POWER], self._data[BAT_CURRENT])
             except KeyError:
                 pass
 
@@ -501,10 +519,10 @@ class SoliscloudAPI(BaseAPI):
             self._data.pop(element)
 
     def _get_value(self,
-        data: dict[str, Any], key: str, type_: type, precision: int = 2
-    ) -> str | int | float | None:
+                   data: dict[str, Any], key: str, type_: type, precision: int = 2
+                   ) -> str | int | float | None:
         """ Retrieve 'key' from 'data' as type 'type_' with precision 'precision' """
-        result : str | int | float | None = None
+        result: str | int | float | None = None
 
         data_raw = data.get(key)
         if data_raw is not None:
@@ -515,19 +533,20 @@ class SoliscloudAPI(BaseAPI):
                     result = type_(data_raw)
                 # Round to specified precision
                 if type_ is float:
-                    result = round(float(result), precision) # type: ignore
+                    result = round(float(result), precision)  # type: ignore
             except ValueError:
-                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", \
-                    key, type_, data_raw)
+                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s",
+                              key, type_, data_raw)
         return result
 
     async def _get_data(self,
-            url: str,
-            params: dict[str, Any]
-        ) -> dict[str, Any]:
+                        url: str,
+                        params: dict[str, Any]
+                        ) -> dict[str, Any]:
         """ Http-get data from specified url. """
 
-        result: dict[str, Any] = {SUCCESS: False, MESSAGE: None, STATUS_CODE: None}
+        result: dict[str, Any] = {SUCCESS: False,
+                                  MESSAGE: None, STATUS_CODE: None}
         resp = None
         if self._session is None:
             return result
@@ -553,7 +572,8 @@ class SoliscloudAPI(BaseAPI):
 
     def _prepare_header(self, body: dict[str, str], canonicalized_resource: str) -> dict[str, str]:
         content_md5 = base64.b64encode(
-            hashlib.md5(json.dumps(body,separators=(",", ":")).encode('utf-8')).digest()
+            hashlib.md5(json.dumps(body, separators=(
+                ",", ":")).encode('utf-8')).digest()
         ).decode('utf-8')
 
         content_type = "application/json"
@@ -562,35 +582,37 @@ class SoliscloudAPI(BaseAPI):
         date = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
         encrypt_str = (VERB + "\n"
-            + content_md5 + "\n"
-            + content_type + "\n"
-            + date + "\n"
-            + canonicalized_resource
-        )
+                       + content_md5 + "\n"
+                       + content_type + "\n"
+                       + date + "\n"
+                       + canonicalized_resource
+                       )
         hmac_obj = hmac.new(
             self.config.secret,
             msg=encrypt_str.encode('utf-8'),
             digestmod=hashlib.sha1
         )
         sign = base64.b64encode(hmac_obj.digest())
-        authorization = "API " + self.config.key_id + ":" + sign.decode('utf-8')
-        
-        header: dict [str, str] = {
-            "Content-MD5":content_md5,
-            "Content-Type":content_type,
-            "Date":date,
-            "Authorization":authorization
+        authorization = "API " + self.config.key_id + \
+            ":" + sign.decode('utf-8')
+
+        header: dict[str, str] = {
+            "Content-MD5": content_md5,
+            "Content-Type": content_type,
+            "Date": date,
+            "Authorization": authorization
         }
         return header
 
-
     async def _post_data_json(self,
-        canonicalized_resource: str,
-        params: dict[str, Any]) -> dict[str, Any]:
+                              canonicalized_resource: str,
+                              params: dict[str, Any]) -> dict[str, Any]:
         """ Http-post data to specified domain/canonicalized_resource. """
 
-        header: dict[str, str] = self._prepare_header(params, canonicalized_resource)
-        result: dict[str, Any] = {SUCCESS: False, MESSAGE: None, STATUS_CODE: None}
+        header: dict[str, str] = self._prepare_header(
+            params, canonicalized_resource)
+        result: dict[str, Any] = {SUCCESS: False,
+                                  MESSAGE: None, STATUS_CODE: None}
         resp = None
         if self._session is None:
             return result
@@ -608,7 +630,8 @@ class SoliscloudAPI(BaseAPI):
                     result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
         except (asyncio.TimeoutError, ClientError) as err:
             result[MESSAGE] = f"{repr(err)}"
-            _LOGGER.debug("Error from URI (%s) : %s", canonicalized_resource, result[MESSAGE])
+            _LOGGER.debug("Error from URI (%s) : %s",
+                          canonicalized_resource, result[MESSAGE])
         finally:
             if resp is not None:
                 await resp.release()

@@ -1,7 +1,7 @@
 {
-  "name": "Ginlong Solis PV portal integration (adjusted by tpguy825)",
-  "content_in_root": false,
-  "render_readme": false,
-  "homeassistant": "2021.9",
-  "domains": ["sensor"]
+	"name": "Ginlong Solis PV portal integration (adjusted by tpguy825)",
+	"content_in_root": false,
+	"render_readme": false,
+	"homeassistant": "2021.9",
+	"domains": ["sensor"]
 }

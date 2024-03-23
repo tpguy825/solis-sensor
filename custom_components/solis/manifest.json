@@ -4,8 +4,8 @@
   "config_flow": true,
   "name": "Solis Inverter",
   "iot_class": "cloud_push",
-  "documentation": "https://github.com/hultenvp/solis-sensor/",
-  "issue_tracker": "https://github.com/hultenvp/solis-sensor/issues",
+  "documentation": "https://github.com/tpguy825/solis-sensor/",
+  "issue_tracker": "https://github.com/tpguy825/solis-sensor/issues",
   "dependencies": [],
-  "codeowners": ["@hultenvp"]
+  "codeowners": ["@hultenvp", "@tpguy825"]
 }

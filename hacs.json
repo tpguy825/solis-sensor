@@ -1,7 +1,8 @@
 {
-	"name": "Ginlong Solis PV portal integration (adjusted)",
+	"name": "SolisCloud portal integration (adjusted)",
 	"content_in_root": false,
 	"render_readme": false,
 	"homeassistant": "2021.9",
 	"domains": ["sensor"]
 }
+

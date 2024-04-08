@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.4.3'
+VERSION = '0.5.2'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -45,7 +45,7 @@ MESSAGE = 'Message'
 
 VERB = "POST"
 
-INVERTER_DETAIL = '/v1/api/inverterDetail'
+INVERTER_DETAIL_LIST = '/v1/api/inverterDetailList'
 PLANT_DETAIL = '/v1/api/stationDetail'
 PLANT_LIST = '/v1/api/userStationList'
 
@@ -53,7 +53,7 @@ InverterDataType = dict[str, dict[str, list]]
 
 """{endpoint: [payload type, {key type, decimal precision}]}"""
 INVERTER_DATA: InverterDataType = {
-    INVERTER_DETAIL: {
+    INVERTER_DETAIL_LIST: {
         INVERTER_SERIAL:                  ['sn', str, None],
         INVERTER_PLANT_ID:                ['stationId', str, None],
         INVERTER_DEVICE_ID:               ['id', str, None],
@@ -66,12 +66,12 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ACPOWER:                 ['pac', float, 3],
         INVERTER_ACPOWER_STR:             ['pacStr', str, None],
         INVERTER_ACFREQUENCY:             ['fac', float, 2],
-        INVERTER_ENERGY_TODAY:            ['eToday', float, 2],  # Default
-        INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
+        INVERTER_ENERGY_TODAY:            ['eToday', float, 3], # Default
+        INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 3],
         INVERTER_ENERGY_THIS_MONTH_STR:   ['eMonthStr', str, None],
-        INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
+        INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 3],
         INVERTER_ENERGY_THIS_YEAR_STR:    ['eYearStr', str, None],
-        INVERTER_ENERGY_TOTAL_LIFE:       ['eTotal', float, 2],
+        INVERTER_ENERGY_TOTAL_LIFE:       ['eTotal', float, 3],
         INVERTER_ENERGY_TOTAL_LIFE_STR:   ['eTotalStr', str, None],
         STRING_COUNT:                     ['dcInputtype', int, None],
         STRING1_VOLTAGE:                  ['uPv1', float, 2],
@@ -104,26 +104,43 @@ INVERTER_DATA: InverterDataType = {
         BAT_TOTAL_ENERGY_CHARGED_STR:     ['batteryTotalChargeEnergyStr', str, None],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 3],
         BAT_TOTAL_ENERGY_DISCHARGED_STR:  ['batteryTotalDischargeEnergyStr', str, None],
-        BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
-        BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
-        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2],
-        GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None],
-        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2],
-        GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2],
-        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
-        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
-        GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 2],
+        BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 3],
+        BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 3],
+        #GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2], #On Plant detail
+        #GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None], #On Plant detail
+        #GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2], #On Plant detail
+        #GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2], #On Plant detail
+        #GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2], #On Plant detail
+        #GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2], #On Plant detail
+        GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_PURCHASED_STR:  ['gridPurchasedTotalEnergyStr', str, None],
-        GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 2],
+        GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 3],
         GRID_TOTAL_ON_GRID_ENERGY_STR:    ['gridSellTotalEnergyStr', str, None],
         GRID_TOTAL_POWER:                 ['psum', float, 3],
         GRID_TOTAL_POWER_STR:             ['psumStr', str, None],
-        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
-        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         GRID_TOTAL_ENERGY_USED:           ['homeLoadTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
+        GRID_PHASE1_POWER:                ['pA', float, 3],
+        GRID_PHASE2_POWER:                ['pB', float, 3],
+        GRID_PHASE3_POWER:                ['pC', float, 3],
+        GRID_APPARENT_PHASE1_POWER:       ['aLookedPower', float, 3],
+        GRID_APPARENT_PHASE2_POWER:       ['bLookedPower', float, 3],
+        GRID_APPARENT_PHASE3_POWER:       ['cLookedPower', float, 3],
+        GRID_REACTIVE_PHASE1_POWER:       ['aReactivePower', float, 3],
+        GRID_REACTIVE_PHASE2_POWER:       ['bReactivePower', float, 3],
+        GRID_REACTIVE_PHASE3_POWER:       ['cReactivePower', float, 3],
+        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
+        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
-        SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0]
+        SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0],
+        BYPASS_LOAD_POWER:                ['bypassLoadPower', float, 3],
+        BYPASS_LOAD_POWER_STR:            ['bypassLoadPowerStr', str, None],
+        METER_ITEM_A_CURRENT:             ['iA', float, 3],
+        METER_ITEM_A_VOLTAGE:             ['uA', float, 3],
+        METER_ITEM_B_CURRENT:             ['iB', float, 3],
+        METER_ITEM_B_VOLTAGE:             ['uB', float, 3],
+        METER_ITEM_C_CURRENT:             ['iC', float, 3],
+        METER_ITEM_C_VOLTAGE:             ['uC', float, 3],
     },
     PLANT_DETAIL: {
         # stationName no longer available?
@@ -131,13 +148,23 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]  # If override set
-    },
-    PLANT_LIST: {
-        # stationName no longer available?
-        INVERTER_PLANT_NAME:              ['sno', str, None],
-        INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]  # If override set
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 3], #If override set
+        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedDayEnergy', float, 3],
+        GRID_DAILY_ENERGY_PURCHASED_STR:  ['gridPurchasedDayEnergyStr', str, None],
+        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 3],
+        GRID_MONTHLY_ENERGY_PURCHASED_STR: ['gridPurchasedMonthEnergyStr', str, None],
+        GRID_MONTHLY_ON_GRID_ENERGY:      ['gridSellMonthEnergy', float, 3],
+        GRID_MONTHLY_ON_GRID_ENERGY_STR:  ['gridSellMonthEnergyStr', str, None],
+        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 3],
+        GRID_YEARLY_ENERGY_PURCHASED_STR: ['gridPurchasedYearEnergyStr', str, None],
+        GRID_YEARLY_ON_GRID_ENERGY:       ['gridSellYearEnergy', float, 3],
+        GRID_YEARLY_ON_GRID_ENERGY_STR:   ['gridSellYearEnergyStr', str, None],
+        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellDayEnergy', float, 3],
+        GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
+        GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 3],
+        GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None],
+        PLANT_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
+        PLANT_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None]
     },
 }
 
@@ -248,8 +275,8 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
             if result_json['code'] != '0':
-                _LOGGER.info("%s responded with error: %s:%s", INVERTER_DETAIL,
-                             result_json['code'], result_json['msg'])
+                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL_LIST, \
+                    result_json['code'], result_json['msg'])
                 return device_ids
             try:
                 for record in result_json['data']['page']['records']:
@@ -280,14 +307,16 @@ class SoliscloudAPI(BaseAPI):
                 await asyncio.sleep(1)
                 payload = await self._get_inverter_details(device_id, inverter_serial)
                 await asyncio.sleep(1)
-                payload2 = await self._get_station_from_list(self.config.plant_id)
+                payload_detail = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     # _LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
-                    self._post_process()
-                if payload2 is not None:
-                    self._collect_station_data(payload2)
+                #if payload2 is not None:
+                #    self._collect_station_list_data(payload2)
+                if payload_detail is not None:
+                    self._collect_plant_data(payload_detail)
                 if self._data is not None and INVERTER_SERIAL in self._data:
+                    self._post_process()
                     return GinlongData(self._data)
                 _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
@@ -302,28 +331,31 @@ class SoliscloudAPI(BaseAPI):
 
         # Get inverter details
         params = {
-            'id': device_id,
-            'sn': device_serial
         }
 
-        result = await self._post_data_json(INVERTER_DETAIL, params)
+        result = await self._post_data_json(INVERTER_DETAIL_LIST, params)
 
         jsondata = None
+        record = None
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
             if jsondata['code'] != '0':
-                _LOGGER.info("%s responded with error: %s:%s", INVERTER_DETAIL,
-                             jsondata['code'], jsondata['msg'])
+                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL_LIST, \
+                    jsondata['code'], jsondata['msg'])
                 return None
+            try:
+                for record in jsondata['data']['records']:
+                    if record.get('sn') == device_serial and record.get('id') == device_id:
+                        return record
+            except TypeError:
+                _LOGGER.debug("Response contains unexpected data: %s", jsondata)
         else:
-            _LOGGER.info(
-                'Unable to fetch details for device with ID: %s', device_id)
-        return jsondata
+            _LOGGER.info('Unable to fetch details for device with ID: %s', device_id)
+        return record
 
     def _collect_inverter_data(self, payload: dict[str, Any]) -> None:
         """ Fetch dynamic properties """
-        jsondata = payload['data']
-        attributes = INVERTER_DATA[INVERTER_DETAIL]
+        attributes = INVERTER_DATA[INVERTER_DETAIL_LIST]
         collect_energy_today = True
         try:
             collect_energy_today = \
@@ -331,7 +363,7 @@ class SoliscloudAPI(BaseAPI):
         except KeyError:
             pass
         if collect_energy_today:
-            _LOGGER.debug("Using inverterDetail for energy_today")
+            _LOGGER.debug("Using inverterDetailList for energy_today")
 
         for dictkey in attributes:
             key = attributes[dictkey][0]
@@ -340,7 +372,7 @@ class SoliscloudAPI(BaseAPI):
             if key is not None:
                 value = None
                 if key != INVERTER_ENERGY_TODAY or collect_energy_today:
-                    value = self._get_value(jsondata, key, type_, precision)
+                    value = self._get_value(payload, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
                     
@@ -373,36 +405,33 @@ class SoliscloudAPI(BaseAPI):
                 'Unable to fetch details for Station with ID: %s', plant_id)
         return None
 
-    async def _get_station_from_list(self, plant_id: str) -> dict[str, str] | None:
-        """
-        Fetch Station from Station List
-        """
-
-        params = {}
-        result = await self._post_data_json(PLANT_LIST, params)
-
-        if result[SUCCESS] is True:
-            jsondata: dict[str, str] = result[CONTENT]
-            if jsondata['code'] == '0':
-                try:
-                    for record in jsondata['data']['page']['records']:
-                        if int(record.get('id')) == int(plant_id):
-                            return record
-                    _LOGGER.warning("Not able to find station %s", plant_id)
-                except TypeError:
-                    _LOGGER.debug(
-                        "Response contains unexpected data: %s", jsondata)
-            else:
-                _LOGGER.info("%s responded with error: %s:%s", PLANT_LIST,
-                             jsondata['code'], jsondata['msg'])
-        else:
-            _LOGGER.info(
-                'Unable to fetch details for Station with ID: %s', plant_id)
-        return None
-
-    def _collect_station_data(self, payload: dict[str, Any]) -> None:
+    def _collect_station_list_data(self, payload: dict[str, Any]) -> None:
         """ Fetch dynamic properties """
         jsondata = payload
+        attributes = INVERTER_DATA[PLANT_LIST]
+        collect_energy_today = False
+        try:
+            collect_energy_today = \
+                self.config.workarounds['use_energy_today_from_plant']
+        except KeyError:
+            pass
+        if collect_energy_today:
+            _LOGGER.debug("Using stationDetail for energy_today")
+
+        for dictkey in attributes:
+            key = attributes[dictkey][0]
+            type_ = attributes[dictkey][1]
+            precision = attributes[dictkey][2]
+            if key is not None:
+                value = None
+                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                    value = self._get_value(jsondata, key, type_, precision)
+                if value is not None:
+                    self._data[dictkey] = value
+
+    def _collect_plant_data(self, payload: dict[str, Any]) -> None:
+        """ Fetch dynamic properties """
+        jsondata = payload['data']
         attributes = INVERTER_DATA[PLANT_DETAIL]
         collect_energy_today = False
         try:
@@ -439,26 +468,25 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(BAT_POWER, BAT_POWER_STR)
             self._fix_units(BAT_CURRENT, BAT_CURRENT_STR)
             self._fix_units(BAT_VOLTAGE, BAT_VOLTAGE_STR)
-            self._fix_units(BAT_TOTAL_ENERGY_CHARGED,
-                            BAT_TOTAL_ENERGY_CHARGED_STR)
-            self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED,
-                            BAT_TOTAL_ENERGY_DISCHARGED_STR)
-            self._fix_units(GRID_TOTAL_CONSUMPTION_POWER,
-                            GRID_TOTAL_CONSUMPTION_POWER_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
+            self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)
+            self._fix_units(PLANT_TOTAL_CONSUMPTION_POWER, PLANT_TOTAL_CONSUMPTION_POWER_STR)
             self._fix_units(GRID_TOTAL_ENERGY_USED, GRID_TOTAL_ENERGY_USED_STR)
             self._fix_units(INVERTER_ACPOWER, INVERTER_ACPOWER_STR)
-            self._fix_units(INVERTER_ENERGY_THIS_MONTH,
-                            INVERTER_ENERGY_THIS_MONTH_STR)
-            self._fix_units(INVERTER_ENERGY_THIS_YEAR,
-                            INVERTER_ENERGY_THIS_YEAR_STR)
-            self._fix_units(INVERTER_ENERGY_TOTAL_LIFE,
-                            INVERTER_ENERGY_TOTAL_LIFE_STR)
-            self._fix_units(GRID_TOTAL_ENERGY_PURCHASED,
-                            GRID_TOTAL_ENERGY_PURCHASED_STR)
-            self._fix_units(GRID_DAILY_ON_GRID_ENERGY,
-                            GRID_DAILY_ON_GRID_ENERGY_STR)
-            self._fix_units(GRID_TOTAL_ON_GRID_ENERGY,
-                            GRID_TOTAL_ON_GRID_ENERGY_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_MONTH, INVERTER_ENERGY_THIS_MONTH_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_YEAR, INVERTER_ENERGY_THIS_YEAR_STR)
+            self._fix_units(INVERTER_ENERGY_TOTAL_LIFE, INVERTER_ENERGY_TOTAL_LIFE_STR)
+            self._fix_units(GRID_TOTAL_ENERGY_PURCHASED, GRID_TOTAL_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_DAILY_ON_GRID_ENERGY, GRID_DAILY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_MONTHLY_ON_GRID_ENERGY, GRID_MONTHLY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_YEARLY_ON_GRID_ENERGY, GRID_YEARLY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_TOTAL_ON_GRID_ENERGY, GRID_TOTAL_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_DAILY_ENERGY_PURCHASED, GRID_DAILY_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_MONTHLY_ENERGY_PURCHASED, GRID_MONTHLY_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_YEARLY_ENERGY_PURCHASED, GRID_YEARLY_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_DAILY_ENERGY_USED, GRID_DAILY_ENERGY_USED_STR)
+            self._fix_units(BYPASS_LOAD_POWER, BYPASS_LOAD_POWER_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
@@ -486,9 +514,13 @@ class SoliscloudAPI(BaseAPI):
             # just making 0 voltage. So this is too simplistic.
             # mypy trips over self_data[STRING_COUNT] as it could be of type str, int or float
             # needs to be fixed at some point in time, but this works.
-            for i, stringlist in enumerate(STRING_LISTS):
-                if i > int(self._data[STRING_COUNT]):
-                    self._purge_if_unused(0, *stringlist)
+            try:
+                for i, stringlist in enumerate(STRING_LISTS):
+                    if i > int(self._data[STRING_COUNT]):
+                        self._purge_if_unused(0, *stringlist)
+            except KeyError:
+                # Ignore offline inverters
+                pass
 
     def _fix_units(self, num_key: str, units_key: str) -> None:
         """ Convert numeric values according to the units reported by the API. """

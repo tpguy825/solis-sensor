@@ -36,7 +36,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.0.1'
+VERSION = '1.0.3'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -155,15 +155,22 @@ class InverterService():
         for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
-                if attribute == INVERTER_ENERGY_TODAY or attribute == INVERTER_ACPOWER:
-                    # Energy_today and AC power are not reset at midnight, but in the 
+
+                if attribute == INVERTER_ACPOWER and getattr(data, INVERTER_STATE) == 2:
+                    # Overriding stale AC Power value when inverter is offline
+                    value = 0
+                elif attribute == INVERTER_ENERGY_TODAY:
+                    # Energy_today is not reset at midnight, but in the 
                     # morning at sunrise when the inverter switches back on. This 
                     # messes up the energy dashboard. Return 0 while inverter is 
                     # still off.
                     is_am = datetime.now().hour < 12
-                    if getattr(data, INVERTER_STATE) == 2 and is_am:
-                        value = 0
-                    elif getattr(data, INVERTER_STATE) == 1 and is_am:
+                    if getattr(data, INVERTER_STATE) == 2:
+                        if is_am:
+                            value = 0
+                        else:
+                            continue
+                    elif getattr(data, INVERTER_STATE) == 1:
                         last_updated_state = None
                         try:
                             last_updated_state = \
@@ -171,14 +178,19 @@ class InverterService():
                         except KeyError:
                             pass
                         if last_updated_state is not None:
-                            # Hybrid systems do not reset in the morning, but just after midnight.
-                            if last_updated_state.hour == 0 and last_updated_state.minute < 15:
-                                value = 0
-                            # Avoid race conditions when between state change in the morning and
-                            # energy today being reset by adding 5 min grace period and
-                            # skipping update
-                            elif last_updated_state + timedelta(minutes=5) > datetime.now():
-                                continue
+                            if is_am:
+                                # Hybrid systems do not reset in the morning, but just after midnight.
+                                if last_updated_state.hour == 0 and last_updated_state.minute < 15:
+                                    value = 0
+                                # Avoid race conditions when between state change in the morning and
+                                # energy today being reset by adding 5 min grace period and
+                                # skipping update
+                                elif last_updated_state + timedelta(minutes=5) > datetime.now():
+                                    continue
+                            else:
+                                if value == 0:
+                                    # SC sometimes produces zeros in the evening, ignore 
+                                    continue
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
     async def async_update(self, *_) -> None:
